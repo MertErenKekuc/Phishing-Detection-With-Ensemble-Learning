@@ -52,7 +52,7 @@ Model performance is evaluated using:
 ## 📈 Experimental Results
 
 ### 🔥 Model Performance Comparison
-<img width="433" height="252" alt="Ekran görüntüsü 2025-12-15 143105" src="https://github.com/user-attachments/assets/ab06204a-4a4e-4418-b699-df818c0c3fd6" />
+<img width="1000" height="600" alt="model_comparison_detailed" src="https://github.com/user-attachments/assets/719c341c-f1ca-4347-9eec-55f7e62725fb" />
 
 ---
 
