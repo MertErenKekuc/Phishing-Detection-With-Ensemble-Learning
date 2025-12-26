@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Phishing Detection System</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #2d3748;
+        }
+        
+        .container {
+            max-width: 550px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeInDown 0.6s ease-out;
+        }
+        
+        .header h1 {
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .header .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.8rem;
+            font-weight: 400;
+        }
+        
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+            font-size: 1.1rem;
+        }
+        
+        input[type="url"] {
+            width: 100%;
+            padding: 10px 10px 10px 38px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+        
+        input[type="url"]:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 9px 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        button[type="submit"] {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+        
+        button[type="button"] {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+        
+        button[type="button"]:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+        
+        .help-text {
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: #718096;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .result {
+            margin-top: 18px;
+            padding: 15px;
+            border-radius: 12px;
+            animation: slideIn 0.5s ease-out;
+            border-left: 4px solid;
+        }
+        
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .result-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        .result-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+        
+        .phish {
+            background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+            border-left-color: #e53e3e;
+        }
+        
+        .phish .result-icon {
+            background: #e53e3e;
+            color: #fff;
+        }
+        
+        .phish .result-title {
+            color: #c53030;
+        }
+        
+        .legit {
+            background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+            border-left-color: #38a169;
+        }
+        
+        .legit .result-icon {
+            background: #38a169;
+            color: #fff;
+        }
+        
+        .legit .result-title {
+            color: #2f855a;
+        }
+        
+        .warn {
+            background: linear-gradient(135deg, #fffff0 0%, #fefcbf 100%);
+            border-left-color: #d69e2e;
+        }
+        
+        .warn .result-icon {
+            background: #d69e2e;
+            color: #fff;
+        }
+        
+        .warn .result-title {
+            color: #b7791f;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .stat-item {
+            background: rgba(255,255,255,0.6);
+            padding: 10px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stat-label {
+            font-size: 0.65rem;
+            color: #718096;
+            margin-bottom: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        
+        .stat-value {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        
+        .tips-card {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .tips-title {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+        }
+        
+        .tip-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            margin-bottom: 6px;
+            font-size: 0.75rem;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+        
+        .tip-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .tip-icon {
+            color: #667eea;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        
+        .analysis-info {
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(102, 126, 234, 0.08);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.7rem;
+            color: #5a67d8;
+        }
+        
+        .alert-warning {
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(237, 137, 54, 0.1);
+            border-left: 3px solid #ed8936;
+            border-radius: 8px;
+            color: #c05621;
+            font-size: 0.8rem;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .card {
+                padding: 18px;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-shield-halved"></i> Phishing Detection</h1>
+            <p class="subtitle">Makine Öğrenmesi ile URL Phishing Analizi</p>
+        </div>
+        
+        <div class="card">
+            <form method="post" novalidate>
+                <div class="form-group">
+                    <label for="url" class="form-label">URL Adresini Girin</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-link input-icon"></i>
+                        <input id="url" name="url" type="url" 
+                               placeholder="https://example.com/login?user=..." 
+                               autofocus required pattern="https?://.+"
+                               value="{{ url_value|default('') }}">
+                    </div>
+                    <p class="help-text">
+                        <i class="fas fa-info-circle"></i>
+                        Protokol belirtilmezse otomatik olarak http:// eklenecektir
+                    </p>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit">
+                        <i class="fas fa-search"></i>
+                        Analiz Et
+                    </button>
+                    <button type="button" onclick="document.getElementById('url').value='';">
+                        <i class="fas fa-trash"></i>
+                        Temizle
+                    </button>
+                </div>
+            </form>
+
+            {% if result and info %}
+                {# visual_color -> phish/warn/legit sınıfına eşle #}
+                {% set box_class = "legit" %}
+                {% set icon_class = "fa-check-circle" %}
+                {% if info.visual_color == "red" %}
+                    {% set box_class = "phish" %}
+                    {% set icon_class = "fa-exclamation-triangle" %}
+                {% elif info.visual_color == "yellow" %}
+                    {% set box_class = "warn" %}
+                    {% set icon_class = "fa-exclamation-circle" %}
+                {% endif %}
+                
+                <div class="result {{ box_class }}">
+                    <div class="result-header">
+                        <div class="result-icon">
+                            <i class="fas {{ icon_class }}"></i>
+                        </div>
+                        <div class="result-title">{{ result }}</div>
+                    </div>
+                    
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Phishing Olasılığı</div>
+                            <div class="stat-value">
+                                {% if info.phishing_probability_pct %}
+                                    {{ info.phishing_probability_pct }}
+                                {% elif info.probabilities_short %}
+                                    {{ info.probabilities_short[0].split(': ')[1] }}
+                                {% else %}
+                                    Bilinmiyor
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <div class="stat-label">Risk Seviyesi</div>
+                            <div class="stat-value">{{ info.risk_level }}</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Güvenlik İpuçları -->
+                    <div class="tips-card">
+                        <div class="tips-title">
+                            <i class="fas fa-lightbulb"></i>
+                            Güvenlik Önerileri
+                        </div>
+                        {% if info.visual_color == "red" %}
+                            <div class="tip-item">
+                                <i class="fas fa-shield-alt tip-icon"></i>
+                                <span>Bu URL'e tıklamayın ve kişisel bilgilerinizi paylaşmayın</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-exclamation-circle tip-icon"></i>
+                                <span>Şüpheli bağlantıları her zaman resmi kaynaklardan doğrulayın</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-lock tip-icon"></i>
+                                <span>Hassas işlemler için sadece HTTPS protokolü kullanan siteleri tercih edin</span>
+                            </div>
+                        {% elif info.visual_color == "yellow" %}
+                            <div class="tip-item">
+                                <i class="fas fa-exclamation-triangle tip-icon"></i>
+                                <span>Bu URL bazı şüpheli özellikler içeriyor, dikkatli olun</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-search tip-icon"></i>
+                                <span>URL'i manuel olarak kontrol edin ve tanınmayan sitelere bilgi vermeyin</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-user-shield tip-icon"></i>
+                                <span>İki faktörlü kimlik doğrulamayı her zaman aktif tutun</span>
+                            </div>
+                        {% else %}
+                            <div class="tip-item">
+                                <i class="fas fa-check-circle tip-icon"></i>
+                                <span>Bu URL güvenli görünüyor ancak her zaman dikkatli olun</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-globe tip-icon"></i>
+                                <span>Tanımadığınız sitelerde kişisel bilgilerinizi paylaşmadan önce düşünün</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-envelope tip-icon"></i>
+                                <span>E-postalardaki bağlantılara tıklamadan önce göndereni doğrulayın</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Analiz Detayları -->
+                    {% if info.features_used %}
+                    <div class="analysis-info">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>{{ info.features_used }} özellik analiz edildi</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if info.disagreement %}
+                    <div class="alert-warning">
+                        <i class="fas fa-info-circle"></i>
+                        Uyarı: Model ve olasılık hesaplaması farklı sonuçlar verdi
+                    </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
